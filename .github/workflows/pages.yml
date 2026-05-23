@@ -21,12 +21,13 @@ jobs:
 
       - name: Substitute secrets
         env:
-          # Add more secrets here — each one becomes a {{NAME}} placeholder.
+          # Add any secret here — it becomes a {{NAME}} placeholder in .md files.
           CN_1: ${{ secrets.CN_1 }}
+          WA_1: ${{ secrets.WA_1 }}
         run: |
           while IFS='=' read -r name value; do
             find . -name '*.md' -not -path './.git/*' -exec sed -i "s|{{${name}}}|${value}|g" {} +
-          done < <(env | grep -E '^(CN_[0-9]+)=')
+          done < <(env | grep -E '^[A-Z]+_[0-9]+=')
 
       - uses: actions/configure-pages@v5
       - uses: actions/jekyll-build-pages@v1
