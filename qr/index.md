@@ -1,5 +1,6 @@
 ---
 title: QR
+layout: none
 ---
 
 Thanks for scanning the QR!
