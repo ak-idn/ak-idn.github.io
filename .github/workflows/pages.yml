@@ -1,0 +1,35 @@
+name: Deploy site to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Substitute secrets
+        env:
+          # Add more secrets here — each one becomes a {{NAME}} placeholder.
+          CN_1: ${{ secrets.CN_1 }}
+        run: |
+          while IFS='=' read -r name value; do
+            find . -name '*.md' -not -path './.git/*' -exec sed -i "s|{{${name}}}|${value}|g" {} +
+          done < <(env | grep -E '^(CN_[0-9]+)=')
+
+      - uses: actions/configure-pages@v5
+      - uses: actions/jekyll-build-pages@v1
+      - uses: actions/upload-pages-artifact@v3
+      - id: deployment
+        uses: actions/deploy-pages@v4
